@@ -17,6 +17,11 @@ namespace IdFw.Models
             return userIdentity;
         }
     }
+    //public class ApplicationRole : IdentityRole
+    //{
+
+    //    public
+    //}
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -29,5 +34,9 @@ namespace IdFw.Models
         {
             return new ApplicationDbContext();
         }
+        //DbSet
+        public DbSet<City> Cityis { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<Person> people { get; set; }
     }
 }

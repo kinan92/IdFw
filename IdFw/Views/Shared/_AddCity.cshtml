@@ -1,0 +1,26 @@
+﻿@model int
+
+<div class="row">
+    @using (Ajax.BeginForm("AddCity", "Countries", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "addedCity",
+        InsertionMode = InsertionMode.InsertAfter,
+        OnComplete = "cleanUp()"
+    }))
+    {
+        <input name="id" value="@Model" type="hidden" />
+        <div class="form-group">
+            <label>City name</label>
+            <input class="form-control" name="Name" />
+        </div>
+        <input type="submit" value="Add city" class="btn btn-sm btn-success" />
+    }
+</div>
+
+<script>
+    function cleanUp() {
+        $("#addCityResult").fadeOut();
+        $("#addCityResult").html("");
+    }
+</script>

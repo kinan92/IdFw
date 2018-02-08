@@ -9,6 +9,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using IdFw.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Collections.Generic;
 
 namespace IdFw.Controllers
 {
@@ -17,6 +19,8 @@ namespace IdFw.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        ApplicationDbContext db = new ApplicationDbContext();
+
 
         public AccountController()
         {
@@ -139,6 +143,15 @@ namespace IdFw.Controllers
         [AllowAnonymous]
         public ActionResult Register()
         {
+            var roleStore = new RoleStore<IdentityRole>(db);
+            var roleManager = new RoleManager<IdentityRole>(roleStore);
+
+            List<SelectListItem> list = new List<SelectListItem>();
+            foreach (var role in roleManager.Roles)
+            {
+                list.Add(new SelectListItem() { Value = role.Name, Text = role.Name });
+            }
+            ViewBag.Roles = list;
             return View();
         }
 
@@ -149,25 +162,29 @@ namespace IdFw.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+            var roleStore = new RoleStore<IdentityRole>(db);
+            var roleManager = new RoleManager<IdentityRole>(roleStore);
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
                     // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    result = await UserManager.AddToRoleAsync(user.Id, model.RoleName);
 
+                    db.SaveChanges();
                     return RedirectToAction("Index", "Home");
                 }
                 AddErrors(result);
             }
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
