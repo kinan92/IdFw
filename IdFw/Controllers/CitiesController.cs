@@ -10,7 +10,7 @@ using IdFw.Models;
 
 namespace IdFw.Controllers
 {
-    [Authorize]
+    [Authorize(Users = "Admin")]
     public class CitiesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

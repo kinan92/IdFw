@@ -12,7 +12,7 @@ namespace IdFw.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             ContextKey = "IdFw.Models.ApplicationDbContext";
         }
 
@@ -31,25 +31,12 @@ namespace IdFw.Migrations
             //    );
             //
 
-            ApplicationUser myAdmin;
-            ApplicationUser myFoo;
-            var userStore = new UserStore<ApplicationUser>(context);
-            var userManager = new UserManager<ApplicationUser>(userStore);
-
             var roleStore = new RoleStore<IdentityRole>(context);
             var roleManager = new RoleManager<IdentityRole>(roleStore);
 
-            if (context.Users.SingleOrDefault(u => u.Email == "admin@admin.se") == null)
-            {
-                myAdmin = new ApplicationUser() { Email = "admin@admin.se", UserName = "admin@admin.se" };
-                userManager.Create(myAdmin, "!23Qwe");
-            }
+            var userStore = new UserStore<ApplicationUser>(context);
+            var userManager = new UserManager<ApplicationUser>(userStore);
 
-            if (context.Users.SingleOrDefault(u => u.Email == "Foo@Foo.se") == null)
-            {
-                myFoo = new ApplicationUser() { Email = "Foo@Foo.se", UserName = "Foo@Foo.se" };
-                userManager.Create(myFoo, "!23Qwe");
-            }
 
             if (roleManager.FindByName("Admin") == null)
             {
@@ -60,9 +47,47 @@ namespace IdFw.Migrations
                 roleManager.Create(new IdentityRole("Commen"));
             }
 
+            ApplicationUser myAdmin;
+            ApplicationUser myFoo;
+
+
+            if (userManager.FindByName("Kinan") == null)
+            {
+                myAdmin = new ApplicationUser()
+                {
+                    Email = "Kinan@Kinan.se",
+                    UserName = "Kinan",
+                    FirstName = "kinan",
+                    LastName = "Karam",
+                    Age = 25,
+                    PhoneNumber="0729026684",
+                    Adress = "Karlskrona",
+
+                };
+                userManager.Create(myAdmin, "!23Qwe");
+            }
+
+            if (context.Users.SingleOrDefault(u => u.Email == "Foo@Foo.se") == null)
+            {
+                myFoo = new ApplicationUser()
+                {
+                    Email = "Foo@Foo.se",
+                    UserName = "Foo",
+                    FirstName = "Foo",
+                    LastName = "Foo",
+                    Age = 25,
+                    PhoneNumber = "0004000014",
+                    Adress = "Växjö",
+
+                };
+
+                userManager.Create(myFoo, "!23Qwe");
+            }
+
+
             context.SaveChanges(); // save Changes to Database
 
-            myAdmin = userManager.FindByEmail("admin@admin.se");
+            myAdmin = userManager.FindByName("Kinan");
             myFoo = userManager.FindByEmail("Foo@Foo.se");
 
             userManager.AddToRole(myAdmin.Id, "Admin");

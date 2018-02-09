@@ -74,12 +74,17 @@ namespace IdFw.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+
+            if (model.Username.Contains('@'))
+            {
+                db.Users.FirstOrDefault(x => x.Id== model.Email);
             }
 
+                return View(model);
+            }
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -166,7 +171,7 @@ namespace IdFw.Controllers
             var roleManager = new RoleManager<IdentityRole>(roleStore);
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Username,FirstName=model.Firstname,LastName=model.Lastname,Age=model.Age, PhoneNumber=model.PhoneNumber, Email = model.Email };
 
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

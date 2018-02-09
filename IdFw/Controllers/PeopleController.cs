@@ -95,7 +95,7 @@ namespace IdFw.Controllers
         }
 
         // GET: people/Delete/5
-        [Authorize(Users = "admin@admin.se")]
+        [Authorize(Users = "Kinan")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -113,7 +113,7 @@ namespace IdFw.Controllers
         // POST: people/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize (Users = "admin@admin.se")]
+        [Authorize (Users = "Kinan")]
         public ActionResult DeleteConfirmed(int id)
         {
             Person Person = db.people.Find(id);
