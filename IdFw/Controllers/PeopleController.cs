@@ -75,7 +75,13 @@ namespace IdFw.Controllers
             {
                 return HttpNotFound();
             }
-            return View(Person);
+            ViewModelPerson vmp = new ViewModelPerson();
+            vmp.country = db.Countries.ToList();
+            vmp.Name = Person.Name;
+            vmp.City = Person.City;
+            vmp.Age = Person.Age;
+            
+            return View(vmp);
         }
 
         // POST: people/Edit/5
@@ -98,6 +104,7 @@ namespace IdFw.Controllers
         [Authorize(Users = "Kinan")]
         public ActionResult Delete(int? id)
         {
+        
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -108,6 +115,7 @@ namespace IdFw.Controllers
                 return HttpNotFound();
             }
             return View(Person);
+
         }
 
         // POST: people/Delete/5

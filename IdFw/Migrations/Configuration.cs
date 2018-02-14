@@ -87,7 +87,7 @@ namespace IdFw.Migrations
 
             context.SaveChanges(); // save Changes to Database
 
-            myAdmin = userManager.FindByName("Kinan");
+            myAdmin = userManager.FindByName("Kinan");//UserName
             myFoo = userManager.FindByEmail("Foo@Foo.se");
 
             userManager.AddToRole(myAdmin.Id, "Admin");

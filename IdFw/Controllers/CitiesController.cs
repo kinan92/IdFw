@@ -10,7 +10,7 @@ using IdFw.Models;
 
 namespace IdFw.Controllers
 {
-    [Authorize(Users = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class CitiesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -108,7 +108,7 @@ namespace IdFw.Controllers
         // POST: Cities/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Users= "admin@admin.se")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             City city = db.Cityis.Find(id);

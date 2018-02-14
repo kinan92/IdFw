@@ -26,7 +26,7 @@ namespace IdFw.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -38,9 +38,9 @@ namespace IdFw.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -72,32 +72,42 @@ namespace IdFw.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
+                if (model.Username.Contains('@'))   // check if the  UserName contane Email
+                {
+                    ApplicationUser temp = db.Users.FirstOrDefault(x => x.Email == model.Username);      //We look to the DataBasefor the Email Give it to Temp
+                    if(temp == null)       //check if there is a user in the Database 
+                    {
+                        return View(model);         // retern the same page 
+                    }
+                    else
+                    {
+                        model.Username = temp.UserName;            // we take the UserName  and loge in 
+                    }
 
-            if (model.Username.Contains('@'))
-            {
-                db.Users.FirstOrDefault(x => x.Id== model.Email);
-            }
+                    
+                }
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, change to shouldLockout: true
+                // We change  the Email to UserName
+                var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
 
-                return View(model);
+                switch (result)
+                {
+                    case SignInStatus.Success:
+                        return RedirectToLocal(returnUrl);
+                    case SignInStatus.LockedOut:
+                        return View("Lockout");
+                    case SignInStatus.RequiresVerification:
+                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    case SignInStatus.Failure:
+                    default:
+                        ModelState.AddModelError("", "Invalid login attempt.");
+                        return View(model);
+                }
             }
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-            }
+            return View(model);         // retern the same page 
         }
 
         //
@@ -129,7 +139,7 @@ namespace IdFw.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -171,7 +181,7 @@ namespace IdFw.Controllers
             var roleManager = new RoleManager<IdentityRole>(roleStore);
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Username,FirstName=model.Firstname,LastName=model.Lastname,Age=model.Age, PhoneNumber=model.PhoneNumber, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Username, FirstName = model.Firstname, LastName = model.Lastname, Age = model.Age, PhoneNumber = model.PhoneNumber, Email = model.Email };
 
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)

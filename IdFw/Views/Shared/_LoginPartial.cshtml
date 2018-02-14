@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+
 @if (Request.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
@@ -6,13 +7,17 @@
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
-        @if(User.IsInRole("Admin"))
+        @if (User.IsInRole("Admin"))
         {
-            <li>Role: Admin </li>
+            <li style="color:aqua">Role: Admin </li>
         }
         @if (User.IsInRole("Commen"))
         {
-            <li>Role: Commen</li>
+            <li style="color:blueviolet">Role: Commen</li>
+        }
+        @if (User.Identity.GetUserName() == "Kinan")
+        {
+            <li style="color:greenyellow"> The King</li>
         }
         <li>
             @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })

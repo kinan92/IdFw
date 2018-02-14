@@ -6,6 +6,7 @@
 
 <h2>Index</h2>
 
+
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
@@ -30,10 +31,28 @@
         </td>
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Details", "Details", new { id=item.Id }) 
+            @if (User.IsInRole("Admin"))
+            {
+                @:|   
+               @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            }
         </td>
     </tr>
 }
-
 </table>
+
+@if (User.IsInRole("Admin"))
+{
+<script>
+    jQuery(document).ready(function () {
+        $("button").click(function () {
+            $("#div1").fadeIn();
+        });
+    });
+</script>
+    <button>see the hint for the Delete</button><br><br>
+    <div id="div1" style="display:none;color:red"><b>Note:</b> If you want to delete You most Logein like "Kinan". </div>
+}
+
+
